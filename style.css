@@ -71,7 +71,8 @@ input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid var(--bord
 .landing-large .subtitle{font-size:22px}
 
 /* ensure td is positioned relative so absolute butterflies align to cell size */
-#chart td{position:relative;height:90px}
+/* row height reduced to 75% (was 90px) */
+#chart td{position:relative;height:67.5px}
 
 
 .preview-mode td:hover{background:rgba(110,231,183,0.06)}

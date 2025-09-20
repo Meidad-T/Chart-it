@@ -44,6 +44,9 @@ export function addRow(name){
   th.textContent = name;
   tr.appendChild(th);
 
+  // make the row header editable (click to rename student)
+  makeRowHeaderEditable(th);
+
   const colCount = columnsRow.children.length - 1;
   for(let i=0;i<colCount;i++){
     const td = document.createElement('td');
@@ -51,6 +54,27 @@ export function addRow(name){
     tr.appendChild(td);
   }
   rowsBody.appendChild(tr);
+}
+
+// Make a row <th> editable similarly to the chart title.
+function makeRowHeaderEditable(th){
+  if(!th) return;
+  th.addEventListener('click', ()=>{
+    th.contentEditable = 'true';
+    th.focus();
+    // select all and move cursor to end
+    document.execCommand('selectAll', false, null);
+    document.getSelection().collapseToEnd();
+  });
+  th.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); th.blur(); }
+    if(e.key === 'Escape'){ th.blur(); }
+  });
+  th.addEventListener('blur', ()=>{
+    th.contentEditable = 'false';
+    const text = (th.textContent || '').trim().slice(0,50);
+    th.textContent = text || '(Unnamed)';
+  });
 }
 
 export function clearChart(){
