@@ -25,7 +25,13 @@ function showLanding(){ landing.classList.remove('hidden'); editor.classList.add
 function showEditor(){ landing.classList.add('hidden'); editor.classList.remove('hidden'); if(backBtn) backBtn.classList.remove('hidden'); }
 
 // Landing 'Create New Chart' -- no warning (fresh start)
-if(newChartBtn2) newChartBtn2.addEventListener('click', ()=>{ Chart.clearChart(); showEditor(); });
+if(newChartBtn2) newChartBtn2.addEventListener('click', ()=>{
+  Chart.clearChart();
+  Chart.setTitle('(Untitled chart)');
+  const chartTitleEl = document.getElementById('chartTitle');
+  if(chartTitleEl) chartTitleEl.textContent = '(Untitled chart)';
+  showEditor();
+});
 
 // Top-nav New Session opens a small confirm modal
 const confirmModal = document.getElementById('confirmModal');
@@ -53,6 +59,9 @@ newChartBtn.addEventListener('click', ()=>{
     Chart.setPreview(false);
     document.getElementById('controls').classList.remove('hidden');
     if(leaveLiveBtn) leaveLiveBtn.classList.add('hidden');
+    Chart.setTitle('(Untitled chart)');
+    const chartTitleEl2 = document.getElementById('chartTitle');
+    if(chartTitleEl2) chartTitleEl2.textContent = '(Untitled chart)';
     showEditor();
   });
 });
@@ -113,9 +122,12 @@ exportConfirmBtn?.addEventListener('click', ()=>{
 clearStarsBtn?.addEventListener('click', ()=>{
   showConfirm('Clear all stars?','This will remove butterflies but keep rows and columns.', ()=>{
     Chart.clearStars();
+    // exit preview mode and restore controls so user can place stars again
     Chart.setPreview(false);
     document.getElementById('controls').classList.remove('hidden');
     if(leaveLiveBtn) leaveLiveBtn.classList.add('hidden');
+    // ensure preview button label matches non-preview state
+    if(previewBtn) previewBtn.textContent = 'Toggle Preview';
     updateUndoButton();
   });
 });
