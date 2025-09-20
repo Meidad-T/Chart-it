@@ -2,15 +2,27 @@
 
 export let previewMode = false;
 
-const columnsRow = document.getElementById('columns');
-const rowsBody = document.getElementById('rows');
+// Lazily resolve DOM elements — some hosts (or module load order) may import modules before DOM is parsed.
+let columnsRow = null;
+let rowsBody = null;
+let chartTitle = '(Untitled chart)';
+
+function ensureDom(){
+  if(!columnsRow) columnsRow = document.getElementById('columns');
+  if(!rowsBody) rowsBody = document.getElementById('rows');
+}
 
 export function setPreview(v){
   previewMode = !!v;
-  document.getElementById('chart').classList.toggle('preview-mode', previewMode);
+  const chartEl = document.getElementById('chart');
+  if(chartEl) chartEl.classList.toggle('preview-mode', previewMode);
 }
 
+export function setTitle(t){ chartTitle = String(t || '').slice(0,50); const el = document.getElementById('chartTitle'); if(el) el.textContent = chartTitle; }
+export function getTitle(){ return chartTitle; }
+
 export function addColumn(name){
+  ensureDom();
   if(!name) return;
   const th = document.createElement('th');
   th.textContent = name;
@@ -25,6 +37,7 @@ export function addColumn(name){
 }
 
 export function addRow(name){
+  ensureDom();
   if(!name) return;
   const tr = document.createElement('tr');
   const th = document.createElement('th');
@@ -41,8 +54,44 @@ export function addRow(name){
 }
 
 export function clearChart(){
+  ensureDom();
   columnsRow.innerHTML = '<th></th>';
   rowsBody.innerHTML = '';
+}
+
+// Remove all butterflies from the chart but keep the rows/columns intact.
+export function clearStars(){
+  ensureDom();
+  const tds = rowsBody.querySelectorAll('td');
+  tds.forEach(td => {
+    const butterflies = td.querySelectorAll('.butterfly');
+    butterflies.forEach(b => b.remove());
+  });
+  // reset history
+  starHistory.length = 0;
+  notifyHistory();
+}
+
+// History stack for placed butterflies to support undo
+const starHistory = [];
+const historyListeners = [];
+
+export function hasUndo(){ return starHistory.length > 0; }
+
+function notifyHistory(){ try{ historyListeners.forEach(cb=>{ try{ cb(); }catch(e){/* ignore listener errors */} }); }catch(e){} }
+
+export function onHistoryChange(cb){ if(typeof cb === 'function') historyListeners.push(cb); }
+
+export function undoLastStar(){
+  const entry = starHistory.pop();
+  notifyHistory();
+  if(!entry) return false;
+  try{
+    if(entry.el && entry.el.parentElement) entry.el.remove();
+    // re-layout the cell where the butterfly was removed
+    try{ if(entry.td) layoutButterfliesInCell(entry.td); }catch(e){}
+  }catch(e){/* ignore */}
+  return true;
 }
 
 function rand(min, max){ return Math.random()*(max-min)+min; }
@@ -157,12 +206,15 @@ function cellClicked(td){
   if(!previewMode) return;
   const color = randomColor();
   const b = createButterfly(color);
+  // record history at click time so undo removes in click order even if animations finish out-of-order
+  try{ starHistory.push({el: b, td}); notifyHistory(); }catch(e){}
   flyButterflyToCell(b, td);
 }
 
 // helpers for serialization: store list of butterflies (colors) per cell
 export function serializeChart(){
-  const data = {columns:[], rows:[], cells:[]};
+  ensureDom();
+  const data = {title: chartTitle, columns:[], rows:[], cells:[]};
   for(let i=1;i<columnsRow.children.length;i++) data.columns.push(columnsRow.children[i].textContent);
   Array.from(rowsBody.children).forEach(tr=>{
     data.rows.push(tr.children[0].textContent);
@@ -179,8 +231,10 @@ export function serializeChart(){
 }
 
 export function restoreChart(data){
+  ensureDom();
   clearChart();
   if(!data) return;
+  if(data.title) setTitle(data.title);
   data.columns?.forEach(c=> addColumn(c));
   data.rows?.forEach(r=> addRow(r));
   data.cells?.forEach((rowCells,rIndex)=>{
@@ -199,5 +253,8 @@ export function restoreChart(data){
       layoutButterfliesInCell(td);
     });
   });
+  // restore should start with an empty history (we're loading a saved state)
+  starHistory.length = 0;
+  notifyHistory();
 }
 

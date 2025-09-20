@@ -16,7 +16,7 @@
         </div>
         <div class="nav-right">
           <button id="newChartBtn" class="nav-btn">New Session</button>
-          <label for="fileInput" class="nav-file">Restore <input id="fileInput" type="file" accept=".chart" hidden /></label>
+          <label for="fileInput" class="nav-file">Upload saved session <input id="fileInput" type="file" accept=".chart" hidden /></label>
           <button id="leaveLiveBtn" class="nav-btn hidden">Leave Live Session Mode</button>
         </div>
       </nav>
@@ -33,8 +33,8 @@
           <p class="subtitle">Create playful charts for your students in seconds.</p>
 
           <div class="hero-actions">
-            <button id="newChartBtn2" class="primary">Create New Chart</button>
-            <label for="fileInput" class="secondary file-label">Restore <input id="fileInput2" type="file" accept=".chart" hidden /></label>
+        <button id="newChartBtn2" class="primary">Create New Chart</button>
+        <label for="fileInput" class="secondary file-label">Upload saved session <input id="fileInput2" type="file" accept=".chart" hidden /></label>
           </div>
 
           <p class="small">Supported file type: <code>.chart</code></p>
@@ -62,6 +62,9 @@
         </div>
 
         <div class="table-wrap">
+          <div id="chartTitleWrapper">
+            <div id="chartTitle" class="chart-title" title="Click to edit">(Untitled chart)</div>
+          </div>
           <table id="chart">
             <thead>
               <tr id="columns"><th></th></tr>
@@ -70,9 +73,11 @@
           </table>
         </div>
 
-        <div class="chart-actions" style="text-align:right;margin-top:12px;">
-          <button id="exportBtn" class="primary">Export</button>
-        </div>
+  <div class="chart-actions" style="text-align:right;margin-top:12px;display:flex;gap:8px;justify-content:flex-end;align-items:center;">
+   <button id="undoBtn" class="secondary" title="Undo last star">Undo</button>
+   <button id="clearStarsBtn" class="secondary">Clear Stars</button>
+   <button id="saveBtn" class="primary">Save Chart</button>
+  </div>
 
         <!-- Export Modal -->
         <div id="exportModal" class="modal hidden">
@@ -80,8 +85,20 @@
             <div class="modal-title">Name your file</div>
             <input id="exportFilename" class="modal-input" type="text" maxlength="64" placeholder="chart" autocomplete="off" />
             <div class="modal-actions">
-              <button id="exportConfirmBtn" class="primary">Export</button>
+              <button id="exportConfirmBtn" class="primary">Save Chart</button>
               <button id="exportCancelBtn" class="secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Erase Modal (small, similar style to export modal) -->
+        <div id="confirmModal" class="modal hidden">
+          <div class="modal-content">
+            <div id="confirmModalTitle" class="modal-title">Confirm</div>
+            <div id="confirmModalBody" class="modal-body" style="margin:8px 0 12px;color:#333;">Are you sure?</div>
+            <div class="modal-actions">
+              <button id="confirmCancelBtn" class="secondary">Cancel</button>
+              <button id="confirmProceedBtn" class="primary">Proceed</button>
             </div>
           </div>
         </div>

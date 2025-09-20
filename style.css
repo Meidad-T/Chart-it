@@ -71,12 +71,12 @@ input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid var(--bord
 .landing-large .subtitle{font-size:22px}
 
 /* ensure td is positioned relative so absolute butterflies align to cell size */
-#chart td{position:relative;height:80px}
+#chart td{position:relative;height:90px}
 
 
 .preview-mode td:hover{background:rgba(110,231,183,0.06)}
 
-.butterfly{position:absolute;width:28px;height:28px;clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);pointer-events:none;transition:transform 0.9s cubic-bezier(.2,.9,.3,1), top 0.9s, left 0.9s;z-index:20;animation:flap 1s infinite alternate;box-shadow:0 8px 18px rgba(11,17,32,0.06);border-radius:4px}
+.butterfly{position:absolute;width:34px;height:34px;clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);pointer-events:none;transition:transform 0.9s cubic-bezier(.2,.9,.3,1), top 0.9s, left 0.9s;z-index:20;animation:flap 1s infinite alternate;box-shadow:0 8px 18px rgba(11,17,32,0.06);border-radius:4px}
 @keyframes flap{from{transform:translate(-50%,-50%) scale(.85) rotate(-8deg)}to{transform:translate(-50%,-50%) scale(1.12) rotate(8deg)}}
 
 /* small screens */
@@ -86,6 +86,14 @@ input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid var(--bord
   #chart{min-width:420px}
   .hero{padding:36px 20px}
 }
+
+/* Chart title */
+.chart-title{font-size:20px;font-weight:700;margin:8px 0 6px;text-align:left;color:#0b1220;cursor:text}
+.chart-title[contenteditable="true"]{outline:2px solid rgba(99,102,241,0.12);padding:6px 8px;border-radius:6px}
+
+/* center and scale chart title */
+#chartTitleWrapper{display:flex;justify-content:center}
+.chart-title{font-size:24px;font-weight:800;margin:6px 0 10px;text-align:center}
 
 .link{background:transparent;color:var(--muted);border:0}
 
