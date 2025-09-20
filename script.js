@@ -123,7 +123,7 @@ function exportChart() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "chart.ivritlee";
+  a.download = "chart.chart";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

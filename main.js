@@ -1,9 +1,6 @@
 import * as Chart from './chart.js';
 import * as Storage from './storage.js';
 
-// inside main.js
-import './script.js';
-
 
 // UI elements
 const landing = document.getElementById('landing');
