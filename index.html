@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Butterfly Chart</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Top navigation -->
+      <nav class="topnav">
+        <div class="nav-left">
+          <button id="backBtn" class="nav-btn hidden">Back</button>
+          <span class="brand">Chart it!</span>
+        </div>
+        <div class="nav-right">
+          <button id="newChartBtn" class="nav-btn">New Session</button>
+          <label for="fileInput" class="nav-file">Restore <input id="fileInput" type="file" accept=".ivritlee" hidden /></label>
+          <button id="leaveLiveBtn" class="nav-btn hidden">Leave Live Session Mode</button>
+        </div>
+      </nav>
+
+      <!-- Landing / Hero -->
+      <section id="landing" class="view landing-large">
+        <div class="hero">
+          <h1 class="title">
+            <span class="title-inner">
+              <span class="title-main">Welcome</span>
+              <span id="typed" class="typed" aria-hidden="true"></span>
+            </span>
+          </h1>
+          <p class="subtitle">Create playful charts for your students in seconds.</p>
+
+          <div class="hero-actions">
+            <button id="newChartBtn2" class="primary">Create New Chart</button>
+            <label for="fileInput" class="secondary file-label">Restore <input id="fileInput2" type="file" accept=".ivritlee" hidden /></label>
+          </div>
+
+          <p class="small">Supported file type: <code>.ivritlee</code></p>
+        </div>
+      </section>
+
+      <!-- Editor -->
+      <section id="editor" class="view hidden">
+        <header class="editor-header">
+          <div class="editor-left">
+            <!-- replaced heading with top nav brand -->
+          </div>
+        </header>
+
+        <div class="controls" id="controls">
+          <div class="control-row">
+            <input type="text" id="columnName" placeholder="Assignment / Column name" />
+            <button id="addColumnBtn">Add Column</button>
+          </div>
+          <div class="control-row">
+            <input type="text" id="rowName" placeholder="Student name" />
+            <button id="addRowBtn">Add Row</button>
+            <button id="previewBtn" class="secondary">Toggle Preview</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="chart">
+            <thead>
+              <tr id="columns"><th></th></tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <div class="chart-actions" style="text-align:right;margin-top:12px;">
+          <button id="exportBtn" class="primary">Export</button>
+        </div>
+
+        <!-- Export Modal -->
+        <div id="exportModal" class="modal hidden">
+          <div class="modal-content">
+            <div class="modal-title">Name your file</div>
+            <input id="exportFilename" class="modal-input" type="text" maxlength="64" placeholder="chart" autocomplete="off" />
+            <div class="modal-actions">
+              <button id="exportConfirmBtn" class="primary">Export</button>
+              <button id="exportCancelBtn" class="secondary">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <input type="file" id="importFile" accept=".ivritlee" style="display:none" />
+      </section>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
