@@ -1,6 +1,6 @@
 // storage.js - responsible for import/export of chart data
 
-export function exportToFile(data, filename = 'chart.ivritlee'){
+export function exportToFile(data, filename = 'chart.chart'){
   const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

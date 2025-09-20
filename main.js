@@ -2,9 +2,7 @@ import * as Chart from './chart.js';
 import * as Storage from './storage.js';
 
 // inside main.js
-import './chart.js';
 import './script.js';
-import './storage.js';
 
 
 // UI elements
@@ -74,7 +72,7 @@ exportConfirmBtn?.addEventListener('click', ()=>{
   const data = Chart.serializeChart();
   let name = (exportFilenameInput.value || 'chart').trim();
   name = name.replace(/[\\/\?%*:|"<>]/g, '-');
-  if(!/\.ivritlee$/i.test(name)) name = name + '.ivritlee';
+  if(!/\.chart$/i.test(name)) name = name + '.chart';
   hideExportModal();
   Storage.exportToFile(data, name);
 });

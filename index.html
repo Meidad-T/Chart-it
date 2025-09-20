@@ -34,10 +34,10 @@
 
           <div class="hero-actions">
             <button id="newChartBtn2" class="primary">Create New Chart</button>
-            <label for="fileInput" class="secondary file-label">Restore <input id="fileInput2" type="file" accept=".ivritlee" hidden /></label>
+            <label for="fileInput" class="secondary file-label">Restore <input id="fileInput2" type="file" accept=".chart" hidden /></label>
           </div>
 
-          <p class="small">Supported file type: <code>.ivritlee</code></p>
+          <p class="small">Supported file type: <code>.chart</code></p>
         </div>
       </section>
 
@@ -86,14 +86,12 @@
           </div>
         </div>
 
-        <input type="file" id="importFile" accept=".ivritlee" style="display:none" />
+        <input type="file" id="importFile" accept=".chart" style="display:none" />
       </section>
     </div>
-
-    <script src="chart.js"></script>
-<script src="script.js"></script>
-<script src="storage.js"></script>
-<script src="main.js"></script>
+    
+    <!-- Use a single module entrypoint. main.js imports other modules. -->
+    <script type="module" src="main.js"></script>
 
   </body>
 </html>
