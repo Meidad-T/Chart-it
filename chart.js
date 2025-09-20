@@ -27,12 +27,34 @@ export function addColumn(name){
   const th = document.createElement('th');
   th.textContent = name;
   columnsRow.appendChild(th);
+  // make column header editable (click to rename column)
+  makeColumnHeaderEditable(th);
 
   // add empty cells to existing rows
   Array.from(rowsBody.querySelectorAll('tr')).forEach(tr=>{
     const td = document.createElement('td');
     td.addEventListener('click', ()=> cellClicked(td));
     tr.appendChild(td);
+  });
+}
+
+// Make a column <th> editable similarly to the chart title and row headers.
+function makeColumnHeaderEditable(th){
+  if(!th) return;
+  th.addEventListener('click', ()=>{
+    th.contentEditable = 'true';
+    th.focus();
+    document.execCommand('selectAll', false, null);
+    document.getSelection().collapseToEnd();
+  });
+  th.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); th.blur(); }
+    if(e.key === 'Escape'){ th.blur(); }
+  });
+  th.addEventListener('blur', ()=>{
+    th.contentEditable = 'false';
+    const text = (th.textContent || '').trim().slice(0,50);
+    th.textContent = text || '(Unnamed)';
   });
 }
 
