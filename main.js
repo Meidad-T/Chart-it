@@ -1,6 +1,12 @@
 import * as Chart from './chart.js';
 import * as Storage from './storage.js';
 
+// inside main.js
+import './chart.js';
+import './script.js';
+import './storage.js';
+
+
 // UI elements
 const landing = document.getElementById('landing');
 const editor = document.getElementById('editor');
