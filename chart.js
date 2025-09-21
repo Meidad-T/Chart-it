@@ -29,6 +29,8 @@ export function addColumn(name){
   columnsRow.appendChild(th);
   // make column header editable (click to rename column)
   makeColumnHeaderEditable(th);
+  // allow header to be targetable for delete-mode; add data attribute index updated on demand
+  th.setAttribute('data-col-index', columnsRow.children.length-1);
 
   // add empty cells to existing rows
   Array.from(rowsBody.querySelectorAll('tr')).forEach(tr=>{
@@ -68,6 +70,7 @@ export function addRow(name){
 
   // make the row header editable (click to rename student)
   makeRowHeaderEditable(th);
+  th.setAttribute('data-row-index', rowsBody.children.length);
 
   const colCount = columnsRow.children.length - 1;
   for(let i=0;i<colCount;i++){
@@ -76,6 +79,58 @@ export function addRow(name){
     tr.appendChild(td);
   }
   rowsBody.appendChild(tr);
+}
+
+// Remove a row by zero-based index (relative to rows list). Returns true if removed.
+export function removeRow(index){
+  ensureDom();
+  const rows = Array.from(rowsBody.children);
+  if(typeof index !== 'number' || index < 0 || index >= rows.length) return false;
+  const tr = rows[index];
+  // remove any butterflies in the row (and from history)
+  const tds = Array.from(tr.querySelectorAll('td'));
+  tds.forEach(td => {
+    const butterflies = Array.from(td.querySelectorAll('.butterfly'));
+    butterflies.forEach(b=>{
+      // remove from DOM
+      try{ if(b.parentElement) b.remove(); }catch(e){}
+      // also remove entries from history referencing this element
+      for(let i = starHistory.length-1;i>=0;i--){ if(starHistory[i].el === b) starHistory.splice(i,1); }
+    });
+  });
+  // remove the row element
+  tr.remove();
+  // re-index row header attributes
+  Array.from(rowsBody.children).forEach((r,i)=>{ const th = r.children[0]; if(th) th.setAttribute('data-row-index', i); });
+  notifyHistory();
+  return true;
+}
+
+// Remove a column by zero-based index (relative to columns list, excluding the corner header). Returns true if removed.
+export function removeColumn(index){
+  ensureDom();
+  const cols = Array.from(columnsRow.children).slice(1); // skip first empty corner
+  if(typeof index !== 'number' || index < 0 || index >= cols.length) return false;
+  const realIndex = index + 1; // adjust to actual child position
+  // remove the header
+  const th = columnsRow.children[realIndex];
+  if(th) th.remove();
+  // remove each corresponding td from rows
+  Array.from(rowsBody.children).forEach(tr=>{
+    const td = tr.children[realIndex];
+    if(td){
+      const butterflies = Array.from(td.querySelectorAll('.butterfly'));
+      butterflies.forEach(b=>{
+        try{ if(b.parentElement) b.remove(); }catch(e){}
+        for(let i = starHistory.length-1;i>=0;i--){ if(starHistory[i].el === b) starHistory.splice(i,1); }
+      });
+      td.remove();
+    }
+  });
+  // reindex data-col-index attributes
+  Array.from(columnsRow.children).forEach((c,i)=>{ if(i>0) c.setAttribute('data-col-index', i); });
+  notifyHistory();
+  return true;
 }
 
 // Make a row <th> editable similarly to the chart title.
@@ -224,8 +279,12 @@ function flyButterflyToCell(butterfly, td){
   butterfly.getBoundingClientRect();
 
   const rect = td.getBoundingClientRect();
-  const targetX = rect.left + rect.width/2;
-  const targetY = rect.top + rect.height/2;
+  // convert viewport coordinates to document coordinates by adding scroll offsets
+  const targetX = rect.left + rect.width/2 + (window.scrollX || window.pageXOffset || 0);
+  const targetY = rect.top + rect.height/2 + (window.scrollY || window.pageYOffset || 0);
+
+  // hint to the browser for smoother transitions
+  butterfly.style.willChange = 'left, top, transform';
 
   butterfly.style.transition = 'left 1s ease, top 1s ease, transform 0.9s ease';
   requestAnimationFrame(()=>{
@@ -238,6 +297,7 @@ function flyButterflyToCell(butterfly, td){
   setTimeout(()=>{
     try{
       butterfly.style.transition = 'none';
+      butterfly.style.willChange = 'auto';
       td.appendChild(butterfly);
       butterfly.style.position = 'absolute';
       butterfly.style.left = '50%';

@@ -17,6 +17,18 @@
         <div class="nav-right">
           <button id="newChartBtn" class="nav-btn">New Session</button>
           <label for="fileInput" class="nav-file">Upload saved session <input id="fileInput" type="file" accept=".chart" hidden /></label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <label for="themeSelect" style="color:white;font-weight:700;margin-right:6px">Theme</label>
+            <select id="themeSelect" style="border-radius:6px;padding:6px 8px;border:0;background:rgba(255,255,255,0.12);">
+              <option value="original">Original</option>
+              <option value="colorful">Colorful</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-left:8px">
+            <label for="titleColorInput" style="color:white;font-weight:700;margin-right:6px">Title Color</label>
+            <input id="titleColorInput" type="color" value="#6b2b8f" title="Chart title color" style="width:36px;height:28px;border-radius:6px;border:0;padding:0" />
+          </div>
+          <button id="deleteModeBtn" class="nav-btn" title="Enter remove mode" style="margin-left:8px;background:rgba(255,255,255,0.08)">Remove rows/cols</button>
           <button id="leaveLiveBtn" class="nav-btn hidden">Leave Live Session Mode</button>
         </div>
       </nav>
