@@ -46,12 +46,15 @@ button, .file-label{
 input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--muted);min-width:220px}
 
 .table-wrap{overflow:auto;background:transparent;border-radius:10px;padding:12px}
-#chart{border-collapse:collapse;margin:16px 0;width:100%;min-width:600px}
-#chart th,#chart td{border:1px solid var(--border);padding:14px 20px;text-align:center;position:relative;min-width:120px;background:#fff}
+/* make the table use fixed layout and be more compact horizontally so trailing star column is visible */
+#chart{border-collapse:collapse;margin:16px 0;width:100%;table-layout:fixed;min-width:480px}
+#chart th,#chart td{border:1px solid var(--border);padding:8px 10px;text-align:center;position:relative;min-width:80px;background:#fff;word-break:break-word}
 #chart th{background:#fafafa;color:var(--muted);font-weight:600}
 
 /* per-row star count cell (trailing column) */
-.row-star-count{font-weight:700;text-align:right;padding-right:18px;color:var(--muted);min-width:60px}
+.row-star-count{font-weight:700;text-align:right;padding-right:12px;color:var(--muted);min-width:48px;width:48px}
+/* make star column visually distinct and keep it from growing too wide */
+.star-header{width:64px}
 
 .editor-actions-btm{display:flex;gap:10px;align-items:center;margin:12px 0}
 .editor-actions-btm .link{background:transparent;color:var(--muted);border:0}
