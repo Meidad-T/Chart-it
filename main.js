@@ -9,6 +9,9 @@ const newChartBtn = document.getElementById('newChartBtn');
 const newChartBtn2 = document.getElementById('newChartBtn2');
 const fileInput = document.getElementById('fileInput');
 const fileInput2 = document.getElementById('fileInput2');
+// track imported file info so we can overwrite on save if possible
+let importedFile = null; // will hold either a File or a FileSystemFileHandle when available
+let chartDirty = false;
 const addColumnBtn = document.getElementById('addColumnBtn');
 const addRowBtn = document.getElementById('addRowBtn');
 const columnName = document.getElementById('columnName');
@@ -74,16 +77,25 @@ fileInput.addEventListener('change', async (e)=>{
     // Normalize older export formats (from legacy script.js) to new format
     data = normalizeImportedData(data);
     Chart.restoreChart(data);
+    // remember imported file so Save can attempt to overwrite
+    importedFile = f;
+    // If browser supports showSaveFilePicker or file handles, later we may try to convert
+    try{ if(window.showSaveFilePicker && f && f.name){ /* no-op, we will request a handle on save if needed */ } }catch(e){}
   updateUndoButton();
     showEditor();
   }catch(err){ alert('Failed to read file: '+err.message); }
   fileInput.value = '';
 });
+
+// mark chart dirty when chart dispatches change events
+document.addEventListener('chart-changed', ()=>{ chartDirty = true; try{ updateUndoButton(); }catch(e){} });
 if(fileInput2) fileInput2.addEventListener('change', async (e)=>{
   const f = e.target.files[0];
   if(!f) return;
   try{ const data = await Storage.readFile(f); Chart.restoreChart(data); showEditor(); }
   catch(err){ alert('Failed to read file: '+err.message); }
+  // remember imported file from secondary uploader as well
+  importedFile = f;
   fileInput2.value = '';
 });
 
@@ -104,7 +116,23 @@ function showExportModal(defaultName = 'chart'){
 }
 function hideExportModal(){ exportModal.classList.add('hidden'); }
 
-if(saveBtn) saveBtn.addEventListener('click', ()=>{ showExportModal('chart'); });
+if(saveBtn) saveBtn.addEventListener('click', ()=>{
+  // If we previously imported a file and chart is dirty, attempt to overwrite without prompting
+  if(importedFile && chartDirty){
+    const data = Chart.serializeChart();
+    (async ()=>{
+      try{
+        const name = (importedFile && importedFile.name) ? importedFile.name : 'chart.chart';
+        const res = await Storage.saveToFileOrDownload(data, name, importedFile);
+        if(res && res.ok){ showToast('Saved successfully ('+res.method+')'); chartDirty = false; }
+        else showToast('Save failed');
+      }catch(err){ console.error(err); showToast('Save failed: '+err.message); }
+    })();
+    return;
+  }
+  // otherwise fall back to showing the save-as modal
+  showExportModal('chart');
+});
 
 exportCancelBtn?.addEventListener('click', hideExportModal);
 exportModal?.addEventListener('click', (e)=>{ if(e.target === exportModal) hideExportModal(); });
@@ -115,8 +143,25 @@ exportConfirmBtn?.addEventListener('click', ()=>{
   name = name.replace(/[\\/\?%*:|"<>]/g, '-');
   if(!/\.chart$/i.test(name)) name = name + '.chart';
   hideExportModal();
-  Storage.exportToFile(data, name);
+  // If we previously imported a file and the filename matches, try to overwrite
+  (async ()=>{
+    try{
+      const res = await Storage.saveToFileOrDownload(data, name, importedFile);
+      if(res && res.ok){ showToast('Saved successfully ('+res.method+')'); }
+      else { showToast('Save failed'); }
+    }catch(err){ console.error(err); showToast('Save failed: '+err.message); }
+  })();
 });
+
+// helper: small toast messages
+function showToast(msg, timeout = 2500){
+  try{
+    let el = document.getElementById('toast-msg');
+    if(!el){ el = document.createElement('div'); el.id = 'toast-msg'; el.style.position='fixed'; el.style.right='18px'; el.style.bottom='18px'; el.style.padding='10px 14px'; el.style.background='rgba(0,0,0,0.8)'; el.style.color='#fff'; el.style.borderRadius='8px'; el.style.zIndex=9999; document.body.appendChild(el); }
+    el.textContent = msg; el.style.opacity = '1';
+    setTimeout(()=>{ try{ el.style.opacity = '0'; }catch(e){} }, timeout);
+  }catch(e){ console.warn('toast failed',e); }
+}
 
 // Clear stars button: remove butterflies but keep rows/columns
 clearStarsBtn?.addEventListener('click', ()=>{

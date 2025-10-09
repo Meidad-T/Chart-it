@@ -51,6 +51,8 @@ export function addColumn(name){
     const starTd = tr.querySelector('td.row-star-count');
     if(starTd) tr.insertBefore(td, starTd); else tr.appendChild(td);
   });
+  // notify that chart changed
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
 }
 
 export function addRow(name){
@@ -76,6 +78,7 @@ export function addRow(name){
   starTd.textContent = '0';
   tr.appendChild(starTd);
   rowsBody.appendChild(tr);
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
 }
 
 function getActualColumnsCount(){
@@ -104,6 +107,7 @@ export function removeRow(index){
   Array.from(rowsBody.children).forEach((r,i)=>{ const th = r.children[0]; if(th) th.setAttribute('data-row-index', i); });
   notifyHistory();
   updateAllRowCounts();
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
   return true;
 }
 
@@ -125,6 +129,7 @@ export function removeColumn(index){
   Array.from(columnsRow.children).forEach((c,i)=>{ if(i>0 && !c.classList.contains('star-header')) c.setAttribute('data-col-index', i); });
   notifyHistory();
   updateAllRowCounts();
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
   return true;
 }
 
@@ -138,6 +143,8 @@ function makeColumnHeaderEditable(th){
   });
   th.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); th.blur(); } if(e.key === 'Escape'){ th.blur(); } });
   th.addEventListener('blur', ()=>{ th.contentEditable = 'false'; const text = (th.textContent || '').trim().slice(0,50); th.textContent = text || '(Unnamed)'; });
+  // dispatch change when header edited
+  th.addEventListener('blur', ()=>{ try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){} });
 }
 
 function makeRowHeaderEditable(th){
@@ -150,6 +157,7 @@ function makeRowHeaderEditable(th){
   });
   th.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); th.blur(); } if(e.key === 'Escape'){ th.blur(); } });
   th.addEventListener('blur', ()=>{ th.contentEditable = 'false'; const text = (th.textContent || '').trim().slice(0,50); th.textContent = text || '(Unnamed)'; });
+  th.addEventListener('blur', ()=>{ try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){} });
 }
 
 export function clearChart(){
@@ -168,6 +176,7 @@ export function clearStars(){
   starHistory.length = 0;
   notifyHistory();
   updateAllRowCounts();
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
 }
 
 const starHistory = [];
@@ -184,6 +193,7 @@ export function undoLastStar(){
   if(!entry) return false;
   try{ if(entry.el && entry.el.parentElement) entry.el.remove(); try{ if(entry.td) layoutButterfliesInCell(entry.td); }catch(e){} }catch(e){}
   try{ if(entry && entry.td){ const tr = entry.td.closest('tr'); if(tr) updateRowStarCount(tr); } }catch(e){}
+  try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
   return true;
 }
 
@@ -250,6 +260,7 @@ function flyButterflyToCell(butterfly, td){
   requestAnimationFrame(()=>{ butterfly.style.left = `${targetX}px`; butterfly.style.top = `${targetY}px`; butterfly.style.transform = 'translate(-50%, -50%)'; });
   setTimeout(()=>{
     try{ butterfly.style.transition = 'none'; butterfly.style.willChange = 'auto'; td.appendChild(butterfly); butterfly.style.position = 'absolute'; butterfly.style.left = '50%'; butterfly.style.top = '50%'; butterfly.style.transform = 'translate(-50%, -50%)'; layoutButterfliesInCell(td); try{ const tr = td.closest('tr'); if(tr) updateRowStarCount(tr); }catch(e){} }catch(e){ console.warn(e); }
+      try{ document.dispatchEvent(new CustomEvent('chart-changed')); }catch(e){}
   }, 1000 + 20);
 }
 
