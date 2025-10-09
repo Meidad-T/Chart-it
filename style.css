@@ -50,6 +50,9 @@ input[type=text]{padding:10px 12px;border-radius:8px;border:1px solid var(--bord
 #chart th,#chart td{border:1px solid var(--border);padding:14px 20px;text-align:center;position:relative;min-width:120px;background:#fff}
 #chart th{background:#fafafa;color:var(--muted);font-weight:600}
 
+/* per-row star count cell (trailing column) */
+.row-star-count{font-weight:700;text-align:right;padding-right:18px;color:var(--muted);min-width:60px}
+
 .editor-actions-btm{display:flex;gap:10px;align-items:center;margin:12px 0}
 .editor-actions-btm .link{background:transparent;color:var(--muted);border:0}
 

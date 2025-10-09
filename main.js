@@ -127,7 +127,7 @@ clearStarsBtn?.addEventListener('click', ()=>{
     document.getElementById('controls').classList.remove('hidden');
     if(leaveLiveBtn) leaveLiveBtn.classList.add('hidden');
     // ensure preview button label matches non-preview state
-    if(previewBtn) previewBtn.textContent = 'Toggle Preview';
+    if(previewBtn) previewBtn.textContent = 'Start The Show';
     updateUndoButton();
   });
 });
@@ -138,7 +138,7 @@ previewBtn.addEventListener('click', ()=>{
   document.getElementById('controls').classList.toggle('hidden', newMode);
   if(leaveLiveBtn) leaveLiveBtn.classList.toggle('hidden', !newMode);
   // update preview button label
-  previewBtn.textContent = newMode ? 'Exit Preview mode' : 'Toggle Preview';
+  previewBtn.textContent = newMode ? 'End The Show' : 'Start The Show';
 });
 
 if(leaveLiveBtn){
@@ -146,7 +146,7 @@ if(leaveLiveBtn){
     Chart.setPreview(false);
     document.getElementById('controls').classList.remove('hidden');
     leaveLiveBtn.classList.add('hidden');
-    if(previewBtn) previewBtn.textContent = 'Toggle Preview';
+    if(previewBtn) previewBtn.textContent = 'Start The Show';
   });
 }
 
@@ -216,9 +216,8 @@ function initChartTitle(){
   chartTitleEl.addEventListener('click', ()=>{
     chartTitleEl.contentEditable = 'true';
     chartTitleEl.focus();
-    // place cursor at end
+    // select all so typing replaces current title
     document.execCommand('selectAll', false, null);
-    document.getSelection().collapseToEnd();
   });
   chartTitleEl.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){ e.preventDefault(); chartTitleEl.blur(); }
@@ -233,6 +232,17 @@ function initChartTitle(){
 }
 
 initChartTitle();
+
+// Ensure existing column and row headers are editable (for restored charts or static HTML)
+function initExistingHeaders(){
+  try{
+    const cols = document.querySelectorAll('#columns th');
+    cols.forEach((th, i)=>{ if(i>0 && !th.classList.contains('star-header')){ th.addEventListener('click', ()=>{ th.contentEditable='true'; th.focus(); document.execCommand('selectAll', false, null); }); th.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); th.blur(); } if(e.key==='Escape') th.blur(); }); th.addEventListener('blur', ()=>{ th.contentEditable='false'; const text = (th.textContent||'').trim().slice(0,50); th.textContent = text || '(Unnamed)'; }); } });
+    const rows = document.querySelectorAll('#rows th');
+    rows.forEach(th=>{ th.addEventListener('click', ()=>{ th.contentEditable='true'; th.focus(); document.execCommand('selectAll', false, null); }); th.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); th.blur(); } if(e.key==='Escape') th.blur(); }); th.addEventListener('blur', ()=>{ th.contentEditable='false'; const text = (th.textContent||'').trim().slice(0,50); th.textContent = text || '(Unnamed)'; }); });
+  }catch(e){/* ignore */}
+}
+initExistingHeaders();
 
 function updateUndoButton(){
   if(!undoBtn) return;
